@@ -1,0 +1,214 @@
+/* Player Bar */
+#player-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.now-playing-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 300px;
+}
+
+.cover-art {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.track-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.track-details .title {
+  font-weight: 700;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.track-details .artist {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.player-controls-container {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.main-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.control-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.control-btn:hover {
+  color: var(--accent-primary);
+}
+.play-btn {
+  background: var(--text-primary);
+  color: var(--bg-main);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.play-btn:hover {
+  transform: scale(1.05);
+  background: white;
+  color: var(--bg-main);
+}
+
+.progress-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.progress-bar-wrapper {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-surface-elevated);
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+}
+.progress-bar-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: var(--text-primary);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+.progress-bar-wrapper:hover .progress-bar-fill {
+  background: var(--accent-primary);
+}
+
+.player-extra-controls {
+  width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+/* Sync Indicator */
+.sync-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  background: rgba(255,255,255,0.05);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+}
+.dot.sync-good { background: var(--success); box-shadow: 0 0 8px var(--success); }
+.dot.sync-fair { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+.dot.sync-poor { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+
+/* Party Mode */
+#party-mode-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg-main);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+#visualizer-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+}
+
+.party-header {
+  position: absolute;
+  top: 24px; left: 24px; right: 24px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 10;
+}
+.party-center {
+  position: relative;
+  z-index: 10;
+  margin: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.party-cover {
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 60px rgba(139, 92, 246, 0.4);
+  margin-bottom: 32px;
+}
+.party-cover.rotating {
+  animation: rotateVinyl 12s linear infinite;
+}
+.party-cover.paused {
+  animation-play-state: paused;
+}
+
+@keyframes rotateVinyl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+#party-title {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+}
+#party-artist {
+  font-size: 24px;
+  color: var(--text-secondary);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+.party-footer {
+  position: absolute;
+  bottom: 40px;
+  left: 10%; right: 10%;
+  z-index: 10;
+}
+.progress-container.large {
+  font-size: 16px;
+}
+.progress-container.large .progress-bar-wrapper {
+  height: 8px; border-radius: 4px; background: rgba(255,255,255,0.2);
+}

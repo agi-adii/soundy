@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SyncPlay - Multi-Device Music Sync</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/player.css">
+  <link rel="stylesheet" href="css/chat-devices.css">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dark-theme">
+  
+  <div id="app-container">
+    <!-- Sidebar / Navigation -->
+    <nav id="sidebar">
+      <div class="brand">
+        <i data-lucide="radio"></i>
+        <span>SyncPlay</span>
+      </div>
+      <ul class="nav-links">
+        <li data-target="home-view" class="active"><i data-lucide="home"></i> Home</li>
+        <li data-target="rooms-view"><i data-lucide="users"></i> Rooms</li>
+        <li data-target="library-view"><i data-lucide="library"></i> Library</li>
+      </ul>
+      <div class="divider"></div>
+      <ul class="nav-links">
+        <li data-target="devices-view"><i data-lucide="smartphone"></i> Devices <span id="nav-device-count" class="badge hidden">0</span></li>
+        <li data-target="settings-view"><i data-lucide="settings"></i> Settings</li>
+      </ul>
+      <div class="user-profile">
+        <div class="avatar">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aditya&backgroundColor=8b5cf6" alt="User">
+        </div>
+        <div class="info">
+          <span class="name" id="user-display-name">Guest User</span>
+          <span class="status">Online</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+      
+      <!-- Home View -->
+      <section id="home-view" class="view active">
+        <header class="view-header">
+          <h1 id="greeting-text">Good evening</h1>
+        </header>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-large" id="btn-create-room">
+            <i data-lucide="plus-circle"></i> Create Room
+          </button>
+          <button class="btn btn-secondary btn-large" id="btn-join-room-prompt">
+            <i data-lucide="log-in"></i> Join Room
+          </button>
+        </div>
+        <div class="section-title"><h3>Recently Played</h3></div>
+        <div class="horizontal-scroll" id="recent-tracks-container"></div>
+      </section>
+
+      <!-- Rooms View -->
+      <section id="rooms-view" class="view">
+        <header class="view-header">
+          <h1>Your Room</h1>
+          <div id="current-room-status" class="room-status-badge hidden">
+            <span class="dot"></span> <span id="current-room-id-text">Not Connected</span>
+          </div>
+        </header>
+        <div id="room-dashboard" class="hidden">
+          <div class="room-banner card glass">
+            <div class="banner-info">
+              <h2>Room Code: <span class="accent-text" id="display-room-code">SYNC88</span></h2>
+              <p>Share this code or the QR to invite friends.</p>
+            </div>
+            <div class="banner-actions">
+              <button class="btn btn-outline" id="btn-show-qr"><i data-lucide="qr-code"></i> Show QR</button>
+              <button class="btn btn-outline" id="btn-copy-link"><i data-lucide="link"></i> Copy Link</button>
+              <button class="btn btn-danger" id="btn-leave-room"><i data-lucide="log-out"></i> Leave</button>
+            </div>
+          </div>
+          <!-- Room Settings for Host -->
+          <div id="host-controls" class="card glass mt-4 hidden">
+            <h3>Host Controls</h3>
+            <div class="setting-row">
+              <span>Allow guests to add songs</span>
+              <label class="switch"><input type="checkbox" id="toggle-guest-add" checked><span class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+              <span>Allow guests to pause/play</span>
+              <label class="switch"><input type="checkbox" id="toggle-guest-pause"><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+        <div id="no-room-state">
+          <div class="empty-state">
+            <i data-lucide="users" class="large-icon"></i>
+            <h2>Not in a room</h2>
+            <p>Create or join a room to listen with friends.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Library View -->
+      <section id="library-view" class="view">
+        <header class="view-header">
+          <h1>Music Library</h1>
+          <button class="btn btn-primary" id="btn-upload-music"><i data-lucide="upload"></i> Upload Audio</button>
+          <input type="file" id="file-upload-input" accept="audio/*" style="display:none">
+        </header>
+        <div class="library-tabs">
+          <button class="tab active" data-tab="catalog">Royalty Free</button>
+          <button class="tab" data-tab="uploads">Uploaded</button>
+        </div>
+        <div class="track-list" id="library-track-list">
+          <!-- Tracks injected here -->
+        </div>
+      </section>
+
+      <!-- Devices View -->
+      <section id="devices-view" class="view">
+        <header class="view-header">
+          <h1>Connected Devices</h1>
+          <button class="btn btn-outline" id="btn-calibrate"><i data-lucide="sliders"></i> Calibrate Sync</button>
+        </header>
+        <div class="devices-list" id="devices-list-container">
+          <!-- Devices injected here -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Right Panel (Queue & Chat) -->
+    <aside id="right-panel">
+      <div class="panel-tabs">
+        <button class="tab active" data-panel="queue">Queue</button>
+        <button class="tab" data-panel="chat">Chat</button>
+      </div>
+      
+      <!-- Queue Panel -->
+      <div id="panel-queue" class="panel-content active">
+        <div class="queue-header">
+          <h3>Up Next</h3>
+          <div class="smart-queue-toggle">
+            <span class="tooltip" data-tooltip="AI Smart Queue">✨</span>
+            <label class="switch"><input type="checkbox" id="toggle-smart-queue"><span class="slider"></span></label>
+          </div>
+        </div>
+        <div id="queue-list" class="queue-list">
+          <div class="empty-state small">Queue is empty</div>
+        </div>
+      </div>
+
+      <!-- Chat Panel -->
+      <div id="panel-chat" class="panel-content">
+        <div id="chat-messages" class="chat-messages">
+          <div class="system-message">Welcome to the room!</div>
+        </div>
+        <div class="chat-input-area">
+          <div class="quick-reactions">
+            <button class="reaction-btn" data-emoji="❤️">❤️</button>
+            <button class="reaction-btn" data-emoji="🔥">🔥</button>
+            <button class="reaction-btn" data-emoji="😂">😂</button>
+            <button class="reaction-btn" data-emoji="🎵">🎵</button>
+            <button class="reaction-btn" data-emoji="👀">👀</button>
+          </div>
+          <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Say something..." autocomplete="off">
+            <button type="submit" class="btn btn-primary icon-only"><i data-lucide="send"></i></button>
+          </form>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Bottom Player Bar -->
+    <footer id="player-bar">
+      <div class="now-playing-info" id="player-bar-info">
+        <img src="" alt="" id="pb-cover" class="cover-art hidden">
+        <div class="track-details">
+          <span class="title" id="pb-title">Not Playing</span>
+          <span class="artist" id="pb-artist">-</span>
+        </div>
+      </div>
+      
+      <div class="player-controls-container">
+        <div class="main-controls">
+          <button class="control-btn" id="btn-prev"><i data-lucide="skip-back"></i></button>
+          <button class="control-btn play-btn" id="btn-play-pause"><i data-lucide="play"></i></button>
+          <button class="control-btn" id="btn-next"><i data-lucide="skip-forward"></i></button>
+        </div>
+        <div class="progress-container">
+          <span class="time" id="time-current">0:00</span>
+          <div class="progress-bar-wrapper" id="progress-wrapper">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+          </div>
+          <span class="time" id="time-total">0:00</span>
+        </div>
+      </div>
+
+      <div class="player-extra-controls">
+        <div class="sync-indicator" id="sync-status-indicator">
+          <span class="dot sync-good"></span> <span class="sync-text">±0 ms</span>
+        </div>
+        <button class="control-btn" id="btn-party-mode" title="Party Mode"><i data-lucide="maximize"></i></button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Party Mode Overlay -->
+  <div id="party-mode-overlay" class="hidden">
+    <canvas id="visualizer-canvas"></canvas>
+    <div class="floating-reactions-container" id="floating-reactions"></div>
+    <div class="party-header">
+      <button class="btn btn-outline" id="btn-exit-party"><i data-lucide="minimize"></i> Exit Party Mode</button>
+      <div class="visualizer-controls">
+        <button class="btn btn-outline" id="btn-cycle-vis"><i data-lucide="activity"></i> Vis Mode</button>
+      </div>
+    </div>
+    <div class="party-center">
+      <img src="" id="party-cover" class="party-cover rotating">
+      <h1 id="party-title">Song Title</h1>
+      <h2 id="party-artist">Artist</h2>
+    </div>
+    <div class="party-footer">
+      <div class="progress-container large">
+        <div class="progress-bar-wrapper" id="party-progress-wrapper">
+          <div class="progress-bar-fill" id="party-progress-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <!-- Create Room Modal -->
+  <div class="modal-overlay hidden" id="modal-create-room">
+    <div class="modal glass">
+      <div class="modal-header">
+        <h2>Create a Room</h2>
+        <button class="close-btn" data-modal="modal-create-room"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Room Name</label>
+          <input type="text" id="input-room-name" placeholder="E.g. Aditya's Party">
+        </div>
+        <div class="form-group">
+          <label>Your Device Name</label>
+          <input type="text" id="input-device-name" placeholder="E.g. Aditya's Laptop">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btn-submit-create-room">Create & Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Room Modal -->
+  <div class="modal-overlay hidden" id="modal-join-room">
+    <div class="modal glass">
+      <div class="modal-header">
+        <h2>Join Room</h2>
+        <button class="close-btn" data-modal="modal-join-room"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Room Code</label>
+          <input type="text" id="input-join-code" placeholder="6-character code" maxlength="6" style="text-transform: uppercase;">
+        </div>
+        <div class="form-group">
+          <label>Your Device Name</label>
+          <input type="text" id="input-join-device-name" placeholder="E.g. Rahul's Phone">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btn-submit-join-room">Join Room</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Code Modal -->
+  <div class="modal-overlay hidden" id="modal-qr">
+    <div class="modal glass text-center">
+      <div class="modal-header">
+        <h2>Invite Friends</h2>
+        <button class="close-btn" data-modal="modal-qr"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <canvas id="qr-canvas"></canvas>
+        <h3 class="accent-text mt-2" id="qr-room-code">SYNC88</h3>
+        <p class="mt-2 text-sm text-muted">Scan to join immediately.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calibration Modal -->
+  <div class="modal-overlay hidden" id="modal-calibration">
+    <div class="modal glass">
+      <div class="modal-header">
+        <h2>Device Sync Calibration</h2>
+        <button class="close-btn" data-modal="modal-calibration"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-sm text-muted mb-4">Bluetooth speakers and wireless headphones can introduce audio delay. Adjust the slider so the audio aligns perfectly.</p>
+        <div class="form-group">
+          <label>Output Delay Offset: <span id="cal-value-display">0 ms</span></label>
+          <input type="range" id="cal-slider" min="-300" max="300" value="0" class="styled-slider">
+        </div>
+        <div class="presets mt-4">
+          <button class="btn btn-outline btn-small" data-offset="0">Wired / Built-in</button>
+          <button class="btn btn-outline btn-small" data-offset="-120">Bluetooth</button>
+          <button class="btn btn-outline btn-small" data-offset="-200">Smart TV / AirPlay</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/utils/helpers.js"></script>
+  <script src="js/state/store.js"></script>
+  <script src="js/state/wsClient.js"></script>
+  <script src="js/sync/clockSync.js"></script>
+  <script src="js/sync/syncEngine.js"></script>
+  <script src="js/audio/player.js"></script>
+  <script src="js/audio/visualizer.js"></script>
+  
+  <script src="js/ui/views.js"></script>
+  <script src="js/ui/queue.js"></script>
+  <script src="js/ui/chat.js"></script>
+  <script src="js/ui/qrModal.js"></script>
+  <script src="js/ui/devicesView.js"></script>
+  
+  <script src="js/app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
