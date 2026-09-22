@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 3. Connect WebSocket
   const host = window.location.hostname;
   const port = window.location.port ? ':' + window.location.port : '';
-  const wsUrl = `ws://${host}${port}`;
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `//System.Management.Automation.Internal.Host.InternalHost`;
   
   window.wsClient = new WSClient(wsUrl);
   
